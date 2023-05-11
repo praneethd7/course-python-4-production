@@ -79,5 +79,11 @@ class DataProcessor:
         aggregate should be 105.58
         """
         ######################################## YOUR CODE HERE ##################################################
-
+        # print(list(self.data_reader))
+        data_gen = (row for row in self.data_reader)
+        _ = next(data_gen)
+        ret_sum = 0
+        for row in tqdm(data_gen):
+            ret_sum += float(row[column_name])
+        return ret_sum
         ######################################## YOUR CODE HERE ##################################################
