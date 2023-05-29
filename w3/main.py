@@ -72,6 +72,7 @@ def batch_files(file_paths: List[str], n_processes: int) -> List[set]:
     second_set = file_paths[first_set_len:]
 
     batches = [set(file_paths[i:i + n_per_batch]) for i in range(0, len(first_set), n_per_batch)]
+    print('first set', first_set)
     for ind, each_file in enumerate(second_set):
         batches[ind].add(each_file)
 
@@ -144,7 +145,7 @@ def main() -> List[Dict]:
     """
 
     st = time.time()
-    n_processes = 3 # you may modify this number - check out multiprocessing.cpu_count() as well
+    n_processes = 3 # multiprocessing.cpu_count() -3 # you may modify this number - check out multiprocessing.cpu_count() as well
 
     parser = argparse.ArgumentParser(description="Choose from one of these : [tst|sml|bg]")
     parser.add_argument('--type',
@@ -160,10 +161,16 @@ def main() -> List[Dict]:
                                       datetime.now().strftime("%B %d %Y %H-%M-%S"))
     make_dir(output_save_folder)
     file_paths = [os.path.join(data_folder_path, file_name) for file_name in files]
-
+    print(file_paths)
     batches = batch_files(file_paths=file_paths, n_processes=n_processes)
 
     ######################################## YOUR CODE HERE ##################################################
+    print("Batches",batches)
+    with multiprocessing.Pool(processes=n_processes) as pool:
+        results = pool.starmap(run, [(batch,n_processes) for batch in batches])
+        pool.close()
+        pool.join()
+        print("Results",results)
 
     ######################################## YOUR CODE HERE ##################################################
 
@@ -171,7 +178,7 @@ def main() -> List[Dict]:
     print("Overall time taken : {}".format(en-st))
 
     # should return revenue data
-    return [{}]
+    return results #[{}] 
 
 
 if __name__ == '__main__':
